@@ -4,25 +4,31 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var catalogRouter = require('./routes/catalog');  //Import routes for "catalog" area of site
+// 1/19
+var catalogRouter = require('./routes/catalog'); //Import routes for "catalog" area of site
 
-var compression = require('compression');
+// 1/21
+var compression = require('compression'); 
 var helmet = require('helmet');
 
 var app = express();
 
 
-// Set up mongoose connection
+// 1/21
+app.use(compression()); //Compress all routes
+app.use(helmet());
+
+// set up mongoose connection 1/17
+
 var mongoose = require('mongoose');
 var dev_db_url = 'mongodb+srv://longgangsima:LINliwei130@cluster1.6t6fu.mongodb.net/local_library?retryWrites=true&w=majority';
 var mongoDB = process.env.MONGODB_URI || dev_db_url;
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.Promise = global.Promise;
+mongoose.connect(mongoDB, {useNewUrlParser: true, userUnifiedTopology:true});
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
+db.on('error',console.error.bind(console, 'MongoDB connection error: '));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -32,19 +38,18 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(helmet());
-app.use(compression()); // Compress all routes
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/catalog', catalogRouter);  // Add catalog routes to middleware chain.
+// 1/19
+app.use('/catalog',catalogRouter); // Add catalog routes to middleware chain.
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
